@@ -1,23 +1,21 @@
-using System.Collections;
 using UnityEngine;
 
 public class MemoriaController : MonoBehaviour
 {
-    //public delegate int PerformCalculation(int x, int y);
     public delegate void Play();
     public Play play;
-    private Animator[] memorias;
+    private Animator[] memoriasAnimations;
     [SerializeField] private GameObject[] gameObjectMemorias;
-    private int[] levelMemoria;
-    [SerializeField] int countMaxGanhou;
+    private int[] filaDeMemoria;
+    [SerializeField] int countMaxGanhouPiscaPisca;
     private int level = 1;
-    private int animacoesIndex, animacoesIndexJogadas;
+    private int animacoesIndexInicio, animacoesIndexJogadas;
 
     private void Start()
     {
-        memorias = new Animator[gameObjectMemorias.Length];
+        memoriasAnimations = new Animator[gameObjectMemorias.Length];
         for(int i=0;i< gameObjectMemorias.Length; i++)
-            memorias[i] = gameObjectMemorias[i].GetComponent<Animator>();
+            memoriasAnimations[i] = gameObjectMemorias[i].GetComponent<Animator>();
     }
 
     private void FixedUpdate()
@@ -36,13 +34,10 @@ public class MemoriaController : MonoBehaviour
             return;
         }
         PlayButtonPressed = true;
-        levelMemoria = new int[level];
+        filaDeMemoria = new int[level];
         for(int i=0;i<level;i++)
-        {
-            levelMemoria[i] = Random.Range(0, 4);
-        }
-        sleepCount = 0;
-        animacoesIndex = 0;
+            filaDeMemoria[i] = Random.Range(0, 4);
+        animacoesIndexInicio = 0;
         animacoesIndexJogadas = 0;
         sleepCount = sleep;
         DesabilitarBotoes = true;
@@ -55,9 +50,9 @@ public class MemoriaController : MonoBehaviour
         if(sleepCount >= sleep)
         {
             sleepCount = 0;
-            TriggerClickAnimacao(levelMemoria[animacoesIndex]);
-            animacoesIndex++;
-            if (animacoesIndex >= level)
+            TriggerClickAnimacao(filaDeMemoria[animacoesIndexInicio]);
+            animacoesIndexInicio++;
+            if (animacoesIndexInicio >= level)
             {
                 play = null;
                 DesabilitarBotoes = false;
@@ -75,7 +70,7 @@ public class MemoriaController : MonoBehaviour
         {
             return;
         }
-        if(indexMemoriaClicado == levelMemoria[animacoesIndexJogadas])
+        if(indexMemoriaClicado == filaDeMemoria[animacoesIndexJogadas])
         {
             if(animacoesIndexJogadas +1 < level)
                 TriggerClickAnimacao(indexMemoriaClicado);
@@ -91,12 +86,12 @@ public class MemoriaController : MonoBehaviour
 
     private void GanhouOuPerdeuPlay()
     {
-        if (memorias[0].GetCurrentAnimatorStateInfo(0).IsName("idle"))
+        if (memoriasAnimations[0].GetCurrentAnimatorStateInfo(0).IsName("idle"))
         {
-            for (int i = 0; i < memorias.Length; i++)
+            for (int i = 0; i < memoriasAnimations.Length; i++)
                 TriggerEventoFinal(i,eventoGanhouOuPerdeu);
             countGanhouPlay++;
-            if (countGanhouPlay == countMaxGanhou)
+            if (countGanhouPlay == countMaxGanhouPiscaPisca)
             {
                 play = null;
                 DesabilitarBotoes = false;
@@ -138,6 +133,6 @@ public class MemoriaController : MonoBehaviour
     private int sleepCount { get; set; } = 0;
     private bool PlayButtonPressed { get; set; } = false;
     private bool DesabilitarBotoes { get; set; } = false;
-    private void TriggerClickAnimacao(int index) => memorias[index].SetTrigger("animacao");
-    private void TriggerEventoFinal(int index,string nome) => memorias[index].SetTrigger(nome);
+    private void TriggerClickAnimacao(int index) => memoriasAnimations[index].SetTrigger("animacao");
+    private void TriggerEventoFinal(int index,string nome) => memoriasAnimations[index].SetTrigger(nome);
 }
